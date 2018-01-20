@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, redirect, url_for
+from flask import Flask, request, redirect, url_for, jsonify
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
@@ -15,10 +15,10 @@ def get_extension(filename):
 
 def allowed_filename(filename):
     return '.' in filename and get_extension(filename) in ALLOWED_EXTENSIONS
- 
+
 @app.route("/hello")
 def hello():
-    return "Welcome to Python Flask App!" + UPLOAD_FOLDER
+    return "Welcome to Python Flask App!"
 
 @app.route("/upload", methods=['POST'])
 def upload_file():
@@ -29,7 +29,7 @@ def upload_file():
     if file.filename == '':
         return 'No file has been uploaded'
 
-    if file and allowed_filename(file.filename):        
+    if file and allowed_filename(file.filename):
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], "data." + get_extension(filename)))
         return 'File uploaded successfully'
@@ -38,7 +38,36 @@ def upload_file():
 
 @app.route("/active-time", methods=['GET'])
 def get_active_time_info():
-    return 'Not implemented yet'
+    return read_from_csv("data")
+    #return '{"message":"Active time not implemented yet"}'
+
+@app.route("/traces", methods=['GET'])
+def get_traces():
+    read_from_csv("data")
+    return '{"message":"Traces not implemented yet"}'
+
+def read_from_csv(filename):
+    with open(os.path.join(app.config['UPLOAD_FOLDER'], filename + ".csv"), 'r') as f:
+
+        header = f.readline()
+        split = header.split(",")
+        print(header)
+        return jsonify(split)
+
+    # for idx, line in enumerate(f)
+    #     line = line.strip()
+    #     if len(line) == 0:
+    #         continue
+
+    #     parts = line.split(",")
+
+    #     if idx == 1:
+    #         lowercaseHeaders = [element.lower() for element in list]
+    #         try:
+    #             resourceIndex = lowercaseHeaders.index("resource")
+    #         except ValueError:
+    #             return '{"message":"error"}' 
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
