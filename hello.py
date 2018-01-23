@@ -36,22 +36,26 @@ def upload_file():
     else:
         return 'Error uploading file' + str(file) + ' ' + str(allowed_filename(file.filename))
 
-@app.route("/active-time", methods=['GET'])
+@app.route("/active-time", methods=['POST'])
 def get_active_time_info():
-    return read_from_csv("data")
-    #return '{"message":"Active time not implemented yet"}'
+    print(request.form["parameters"]);
+    return '{"message":"Active time not implemented yet"}'
 
 @app.route("/traces", methods=['GET'])
 def get_traces():
-    read_from_csv("data")
+    #read_from_csv("data")
     return '{"message":"Traces not implemented yet"}'
 
-def read_from_csv(filename):
-    with open(os.path.join(app.config['UPLOAD_FOLDER'], filename + ".csv"), 'r') as f:
+@app.route("/file-headers", methods=['GET'])
+def get_file_headers():
+    return read_headers_from_csv("data")
 
-        header = f.readline()
-        split = header.split(",")
+def read_headers_from_csv(filename):
+    with open(os.path.join(app.config['UPLOAD_FOLDER'], filename + ".csv"), 'r') as f:
+        header = f.readline().strip()
         print(header)
+        has_commas = "," in header
+        split = header.split(",") if has_commas else header.split(";")
         return jsonify(split)
 
     # for idx, line in enumerate(f)
