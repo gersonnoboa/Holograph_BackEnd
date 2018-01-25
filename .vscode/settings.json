@@ -1,3 +1,7 @@
 {
-    "python.pythonPath": "C:\\Users\\hp\\Documents\\Dev\\holograph\\Holograph_BackEnd\\venv\\Scripts"
+    "python.pythonPath": "C:\\Users\\hp\\Documents\\Dev\\holograph\\Holograph_BackEnd\\venv\\Scripts",
+    "files.exclude": {
+        "__pycache__/": true,
+        "venv/": true
+    }
 }
