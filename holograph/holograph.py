@@ -5,6 +5,7 @@ import os
 import file_handling
 import csv_handling
 import active_time_mining
+import trace_mining
 
 app = Flask(__name__)
 CORS(app)
@@ -42,10 +43,12 @@ def get_active_time_info():
     return active_time_mining.process_active_time_info(request.get_json(force=True), filepath)
 
 
-@app.route("/traces", methods=['GET'])
+@app.route("/traces", methods=['POST'])
 def get_traces():
-    #read_from_csv("data")
-    return '{"message":"Traces not implemented yet"}'
+    folder = app.config['UPLOAD_FOLDER']
+    filename = "data.csv"
+    filepath = os.path.join(folder, filename)
+    return trace_mining.process_trace_info(request.get_json(force=True), filepath)
 
 
 @app.route("/file-headers", methods=['GET'])
