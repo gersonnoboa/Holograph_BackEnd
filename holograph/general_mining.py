@@ -3,13 +3,13 @@ from datetime import datetime
 import enums
 import jsonpickle
 
-def get_active_time_array(json_from_request, filepath):
-    case_id = str(json_from_request["caseID"])
-    resource = str(json_from_request["resource"])
-    activity = str(json_from_request["activity"])
-    log_type = str(json_from_request["type"])
-    parameter_one = str(json_from_request["parameterOne"])
-    parameter_two = str(json_from_request["parameterTwo"])
+def get_active_time_array(args_from_request, filepath):
+    case_id = args_from_request.get("caseID")
+    resource = args_from_request.get("resource")
+    activity = args_from_request.get("activity")
+    log_type = args_from_request.get("type")
+    parameter_one = args_from_request.get("parameterOne")
+    parameter_two = args_from_request.get("parameterTwo")
 
     idx_resource = 0
     idx_activity = 0

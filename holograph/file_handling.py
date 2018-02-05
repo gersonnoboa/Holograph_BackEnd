@@ -1,6 +1,7 @@
 import os
 from werkzeug.utils import secure_filename
 from flask import request
+import uuid
 
 def get_extension(filename):
     return filename.rsplit('.', 1)[1].lower()
@@ -21,7 +22,9 @@ def save_file(file, folder, allowed_extensions):
 
     if file and allowed_filename(file.filename, allowed_extensions):
         filename = secure_filename(file.filename)
-        file.save(os.path.join(folder, "data." + get_extension(filename)))
-        return True
+        uuid_for_filename = str(uuid.uuid4())
+        filename_with_extension = uuid_for_filename + "." + get_extension(filename)
+        file.save(os.path.join(folder, filename_with_extension))
+        return filename_with_extension
     else:
-        return False
+        return None

@@ -29,32 +29,33 @@ def upload_file():
     folder = app.config['UPLOAD_FOLDER']
     file_saved_successfully = file_handling.save_file(file, folder, allowed_extensions)
 
-    if not file_saved_successfully:
+    if file_saved_successfully is None:
         return "Error uploading file"
 
-    return "File uploaded successfully"
+    return file_saved_successfully
 
 
-@app.route("/active-time", methods=['POST'])
+@app.route("/active-time", methods=['GET'])
 def get_active_time_info():
     folder = app.config['UPLOAD_FOLDER']
-    filename = "data.csv"
+    filename = request.args.get('fileID')
     filepath = os.path.join(folder, filename)
-    return active_time_mining.process_active_time_info(request.get_json(force=True), filepath)
+    return active_time_mining.process_active_time_info(request.args, filepath)
 
 
-@app.route("/traces", methods=['POST'])
+@app.route("/traces", methods=['GET'])
 def get_traces():
     folder = app.config['UPLOAD_FOLDER']
-    filename = "data.csv"
+    filename = request.args.get('fileID')
     filepath = os.path.join(folder, filename)
-    return trace_mining.process_trace_info(request.get_json(force=True), filepath)
+    return trace_mining.process_trace_info(request.args, filepath)
 
 
 @app.route("/file-headers", methods=['GET'])
 def get_file_headers():
     folder = app.config['UPLOAD_FOLDER']
-    filename = "data.csv"
+    filename = request.args.get('fileID')
+    print("file name received " + filename)
     filepath = os.path.join(folder, filename)
     return csv_handling.read_headers_from_csv(filepath)
 

@@ -4,8 +4,8 @@ from datetime import datetime
 import enums
 import general_mining
 
-def process_trace_info(json_from_request, filepath):
-    lst = general_mining.get_active_time_array(json_from_request, filepath)
+def process_trace_info(args_from_request, filepath):
+    lst = general_mining.get_active_time_array(args_from_request, filepath)
     mining = general_mining.get_variants(lst)
     return jsonpickle.encode(mining, unpicklable=False)
 
