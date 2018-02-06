@@ -2,6 +2,8 @@ import csv_handling
 from datetime import datetime
 import enums
 import jsonpickle
+import arrow
+import string
 
 def get_active_time_array(args_from_request, filepath):
     case_id = args_from_request.get("caseID")
@@ -19,6 +21,8 @@ def get_active_time_array(args_from_request, filepath):
     lst = []
 
     with open(filepath, 'r') as f:
+
+        format_string = ""
         for idx, line in enumerate(f):
             line = line.strip()
 
@@ -34,21 +38,49 @@ def get_active_time_array(args_from_request, filepath):
                 idx_parameter_one = split.index(parameter_one)
                 if (log_type == enums.LogType.StartAndEndDate.value):
                     idx_parameter_two = split.index(parameter_two)
+
+                format_string = infer_date_format_string(split)
             else:
                 case = split[idx_case_id]
                 res = split[idx_resource]
                 act = split[idx_activity]
+                date_one = split[idx_parameter_one]
+                start_date = arrow.now()
+
+                try:
+                    start_date = arrow.get(date_one)
+                except:
+                    if format_string is not None:
+                        start_date = arrow.get(date_one, format_string)
+
                 if (log_type == enums.LogType.StartAndEndDate.value):
-                    start_date = datetime.strptime(
-                        split[idx_parameter_one], '%d-%m-%Y:%H.%M')
-                    end_date = datetime.strptime(
-                        split[idx_parameter_two], '%d-%m-%Y:%H.%M')
+
+                    date_two = split[idx_parameter_two]
+                    end_date = arrow.now()
+
+                    try:
+                        end_date = arrow.get(date_two)
+                    except:
+                        if format_string is not None:
+                            end_date = arrow.get(date_two, format_string)
+
                     event = LogEvent(case, res, act, start_date, end_date)
                     lst.append(event)
 
     lst.sort(key=lambda x: x.start_date, reverse=False)
     return lst
 
+
+def infer_date_format_string(split):
+    format_string = ""
+    for element in split:
+        lower_element = element.lower()
+        if "yyyy" in lower_element:
+            format_string = element
+            break
+
+    fixed_string = format_string.replace("dd", "DD").replace("yyyy", "YYYY")
+    return fixed_string
 
 def get_variants(events):
     cases = get_grouped_cases(events)

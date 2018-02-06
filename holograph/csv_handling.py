@@ -10,3 +10,5 @@ def read_headers_from_csv(filepath):
 def split_csv_line(line):
     has_commas = "," in line
     return line.split(",") if has_commas else line.split(";")
+
+

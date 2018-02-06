@@ -11,7 +11,9 @@ def process_trace_info(args_from_request, filepath):
 
 
 def mine_trace_info(lst):
-    pass
+    for variant in lst:
+        pass
+
 
 class TraceVariant(general_mining.Variant):
     def __init__(self, activity_list, cases, resource):
