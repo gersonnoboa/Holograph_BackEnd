@@ -1,5 +1,6 @@
 import csv_handling
 from datetime import datetime
+from dateutil.parser import parse
 import enums
 import jsonpickle
 import arrow
@@ -12,7 +13,8 @@ def get_active_time_array(args_from_request, filepath):
     log_type = args_from_request.get("type")
     parameter_one = args_from_request.get("parameterOne")
     parameter_two = args_from_request.get("parameterTwo")
-
+    remote_date_format_string = args_from_request.get("dateTimeFormat")
+    local_date_format_string = None
     idx_resource = 0
     idx_activity = 0
     idx_parameter_one = 0
@@ -39,36 +41,51 @@ def get_active_time_array(args_from_request, filepath):
                 if (log_type == enums.LogType.StartAndEndDate.value):
                     idx_parameter_two = split.index(parameter_two)
 
-                format_string = infer_date_format_string(split)
+                local_date_format_string = infer_date_format_string(split)
             else:
                 case = split[idx_case_id]
                 res = split[idx_resource]
                 act = split[idx_activity]
                 date_one = split[idx_parameter_one]
-                start_date = arrow.now()
+                start_date = try_date_time_retrieval(date_one, remote_date_format_string, local_date_format_string)
 
-                try:
-                    start_date = arrow.get(date_one)
-                except:
-                    if format_string is not None:
-                        start_date = arrow.get(date_one, format_string)
+                event = LogEvent(case, res, act, start_date)
+
+                if idx == 1:
+                    print(start_date)
 
                 if (log_type == enums.LogType.StartAndEndDate.value):
-
                     date_two = split[idx_parameter_two]
-                    end_date = arrow.now()
+                    end_date = try_date_time_retrieval(date_two, remote_date_format_string, local_date_format_string)
+                    event.end_date = end_date
 
-                    try:
-                        end_date = arrow.get(date_two)
-                    except:
-                        if format_string is not None:
-                            end_date = arrow.get(date_two, format_string)
-
-                    event = LogEvent(case, res, act, start_date, end_date)
-                    lst.append(event)
+                lst.append(event)
 
     lst.sort(key=lambda x: x.start_date, reverse=False)
     return lst
+
+
+def try_date_time_retrieval(string_date, priority_format_string, secondary_format_string):
+    ret_date = None
+    if priority_format_string is not None:
+        try:
+            ret_date = arrow.get(string_date, fix_date_format_string(priority_format_string))
+        except:
+            converted_format_string = convert_date_format_string_to_python(priority_format_string)
+            ret_date = datetime.strptime(string_date, converted_format_string)
+    else:
+        try:
+            ret_date = arrow.get(string_date)
+        except:
+            if secondary_format_string is not None:
+                try:
+                    ret_date = arrow.get(string_date, fix_date_format_string(secondary_format_string))
+                except:
+                    converted_format_string = convert_date_format_string_to_python(secondary_format_string)
+                    ret_date = datetime.strptime(string_date, converted_format_string)
+
+
+    return ret_date
 
 
 def infer_date_format_string(split):
@@ -79,8 +96,23 @@ def infer_date_format_string(split):
             format_string = element
             break
 
-    fixed_string = format_string.replace("dd", "DD").replace("yyyy", "YYYY")
+    fixed_string = fix_date_format_string(format_string)
     return fixed_string
+
+
+def convert_date_format_string_to_python(str):
+
+    return (str.replace("yyyy", "%Y")
+           .replace("yy", "%y")
+           .replace("dd", "%d")
+           .replace("MM", "%m")
+           .replace("HH", "%H")
+           .replace("mm", "%M")
+           .replace("SS", "%S"))
+
+def fix_date_format_string(format_string):
+    return format_string.replace("dd", "DD").replace("yyyy", "YYYY").replace("yy", "YY")
+
 
 def get_variants(events):
     cases = get_grouped_cases(events)
@@ -121,12 +153,12 @@ class Variant:
 
 
 class LogEvent:
-    def __init__(self, case_id, resource, activity, start_date, end_date):
+    def __init__(self, case_id, resource, activity, start_date):
         self.case_id = case_id
         self.resource = resource
         self.activity = activity
         self.start_date = start_date
-        self.end_date = end_date
+        self.end_date = arrow.now()
 
     def subtract_dates(self):
         return (self.end_date - self.start_date).seconds

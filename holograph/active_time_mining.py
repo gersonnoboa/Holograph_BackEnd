@@ -21,12 +21,10 @@ def mine_active_time_info(lst):
         for resource in resources:
             all_events_for_resource = [
                 event for event in all_events_for_activity if event.resource == resource]
-            total_active_time = sum([e.subtract_dates()
-                                     for e in all_events_for_resource])
+            total_active_time = sum([e.subtract_dates() for e in all_events_for_resource])
             event_count = len(all_events_for_resource)
             average_active_time = float(total_active_time) / float(event_count)
-            list_resources.append(ActivityResource(
-                resource, total_active_time, event_count, average_active_time))
+            list_resources.append(ActivityResource(resource, total_active_time, event_count, average_active_time))
 
         list_activities.append(Activity(activity, list_resources))
 
