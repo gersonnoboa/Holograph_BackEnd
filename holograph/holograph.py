@@ -55,9 +55,9 @@ def get_traces():
 def get_file_headers():
     folder = app.config['UPLOAD_FOLDER']
     filename = request.args.get('fileID')
-    print("file name received " + filename)
     filepath = os.path.join(folder, filename)
-    return csv_handling.read_headers_from_csv(filepath)
+    #return csv_handling.read_headers_and_first_row_from_csv(filepath)
+    return csv_handling.read_info_from_csv(filepath)
 
 
 if __name__ == "__main__":

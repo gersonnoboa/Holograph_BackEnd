@@ -51,9 +51,6 @@ def get_active_time_array(args_from_request, filepath):
 
                 event = LogEvent(case, res, act, start_date)
 
-                if idx == 1:
-                    print(start_date)
-
                 if (log_type == enums.LogType.StartAndEndDate.value):
                     date_two = split[idx_parameter_two]
                     end_date = try_date_time_retrieval(date_two, remote_date_format_string, local_date_format_string)
