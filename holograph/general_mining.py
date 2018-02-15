@@ -23,40 +23,35 @@ def get_active_time_array(args_from_request, filepath):
     lst = []
 
     with open(filepath, 'r') as f:
+        reader = csv_handling.get_csv_reader(f)
 
-        format_string = ""
-        for idx, line in enumerate(f):
-            line = line.strip()
+        split = next(reader)
 
-            if len(line) == 0:
-                continue
+        idx_case_id = split.index(case_id)
+        idx_resource = split.index(resource)
+        idx_activity = split.index(activity)
+        idx_parameter_one = split.index(parameter_one)
+        if (log_type == enums.LogType.StartAndEndDate.value):
+            idx_parameter_two = split.index(parameter_two)
 
-            split = csv_handling.split_csv_line(line)
+        local_date_format_string = infer_date_format_string(split)
 
-            if idx == 0:
-                idx_case_id = split.index(case_id)
-                idx_resource = split.index(resource)
-                idx_activity = split.index(activity)
-                idx_parameter_one = split.index(parameter_one)
-                if (log_type == enums.LogType.StartAndEndDate.value):
-                    idx_parameter_two = split.index(parameter_two)
+        for row in reader:
+            case = row[idx_case_id]
+            res = row[idx_resource]
+            act = row[idx_activity]
+            date_one = row[idx_parameter_one]
+            start_date = try_date_time_retrieval(date_one, remote_date_format_string, local_date_format_string)
 
-                local_date_format_string = infer_date_format_string(split)
-            else:
-                case = split[idx_case_id]
-                res = split[idx_resource]
-                act = split[idx_activity]
-                date_one = split[idx_parameter_one]
-                start_date = try_date_time_retrieval(date_one, remote_date_format_string, local_date_format_string)
+            event = LogEvent(case, res, act, start_date)
 
-                event = LogEvent(case, res, act, start_date)
+            if (log_type == enums.LogType.StartAndEndDate.value):
+                date_two = row[idx_parameter_two]
+                end_date = try_date_time_retrieval(date_two, remote_date_format_string, local_date_format_string)
+                event.end_date = end_date
 
-                if (log_type == enums.LogType.StartAndEndDate.value):
-                    date_two = split[idx_parameter_two]
-                    end_date = try_date_time_retrieval(date_two, remote_date_format_string, local_date_format_string)
-                    event.end_date = end_date
+            lst.append(event)
 
-                lst.append(event)
 
     lst.sort(key=lambda x: x.start_date, reverse=False)
     return lst
@@ -118,7 +113,7 @@ def get_variants(events):
     for case in cases:
         determine_variant(case, variants)
 
-    return jsonpickle.encode(variants, unpicklable=False)
+    return variants
 
 
 def determine_variant(case, variant_list):
