@@ -50,11 +50,84 @@ def mine_trace_info(lst):
             resource.maximum_time_without = stats_without.maximum
             resource.average_time_without = stats_without.average
 
+            update_facts(resource, trace_variant)
             trace_variant.resources.append(resource)
         
         trace_variants.append(trace_variant)
     
     return trace_variants
+
+
+def update_facts(resource, trace_variant):
+    quickest = trace_variant.get_fact(FactName.Quickest.value)
+    revise_fact(quickest, resource.minimum_time_with, resource.name, False)
+
+    slowest = trace_variant.get_fact(FactName.Slowest.value)
+    revise_fact(slowest, resource.maximum_time_with, resource.name, True)
+
+    above_average = trace_variant.get_fact(FactName.AboveAverage.value)
+    accumulate_fact(above_average, resource.average_time_with, resource.name, True)
+
+    below_average = trace_variant.get_fact(FactName.BelowAverage.value)
+    accumulate_fact(below_average, resource.average_time_with, resource.name, False)
+
+    positive_impact = trace_variant.get_fact(FactName.PositiveImpact.value)
+    accumulate_fact_with_threshold(positive_impact, resource.average_time_with, resource.name, True, trace_variant.average_time)
+
+    negative_impact = trace_variant.get_fact(FactName.NegativeImpact.value)
+    accumulate_fact_with_threshold(
+        negative_impact, resource.average_time_with, resource.name, False, trace_variant.average_time)
+
+    most_involved = trace_variant.get_fact(FactName.MostInvolved.value)
+    revise_fact(most_involved, resource.total_time_with, resource.name, True)
+
+    least_involved = trace_variant.get_fact(FactName.LeastInvolved.value)
+    revise_fact(least_involved, resource.total_time_with, resource.name, False)
+
+
+def revise_fact(fact, new_value, resource_name, higher_is_better):
+    revise_fact_with_threshold(fact, new_value, resource_name, higher_is_better, fact.value)
+
+
+def revise_fact_with_threshold(fact, new_value, resource_name, higher_is_better, threshold):
+    diff_condition = False
+    equal_condition = False
+    if (fact.value is None):
+        diff_condition = True
+    else:
+        diff_condition = new_value > threshold if higher_is_better else new_value < threshold
+        equal_condition = new_value == threshold
+    
+    if diff_condition:
+        fact.value = new_value
+        fact.elements.clear()
+        fact.elements.append(resource_name)
+    elif equal_condition:
+        fact.elements.append(resource_name)
+
+
+def accumulate_fact(fact, new_value, resource_name, higher_is_better):
+    accumulate_fact_with_threshold(fact, new_value, resource_name, higher_is_better, fact.value)
+
+
+def accumulate_fact_with_threshold(fact, new_value, resource_name, higher_is_better, threshold):
+    diff_condition = False
+
+    if (fact.value is None):
+        fact.value = new_value
+        diff_condition = True
+    else:
+        diff_condition = new_value >= threshold if higher_is_better else new_value < threshold
+
+    if diff_condition:
+        fact.elements.append(resource_name)
+
+
+def update_element(element_list, name, should_clear):
+    if should_clear:
+        element_list.clear()
+    
+    element_list.append(name)
 
 
 def determine_resource_existence(resource, case):
@@ -122,15 +195,25 @@ def get_last_event_in_cases(cases):
 
 
 class TraceVariant():
-
     total_time = 0
     average_time = 0
     minimum_time = 0
     maximum_time = 0
+    facts = []
 
     def __init__(self, activity_list):
         self.activity_list = activity_list
         self.resources = []
+        self.facts = []
+
+    def get_fact(self, fact_name):
+        all_facts = list(fact for fact in self.facts if fact.name == fact_name)
+        if len(all_facts) == 0:
+            fact = Fact(fact_name)
+            self.facts.append(fact)
+            return fact
+        else:
+            return all_facts[0]
 
 
 class TraceResource():
@@ -152,3 +235,21 @@ class Stats():
         self.minimum = minimum
         self.maximum = maximum
         self.average = average
+
+
+class Fact():
+    def __init__(self, name):
+        self.name = name
+        self.value = None
+        self.elements = []
+
+
+class FactName(enums.Enum):
+    Quickest = "Quickest"
+    Slowest = "Slowest"
+    AboveAverage = "Above Average"
+    BelowAverage = "Below Average"
+    PositiveImpact = "Positive Impact"
+    NegativeImpact = "Negative Impact"
+    MostInvolved = "Most Involved"
+    LeastInvolved = "Least Involved"
