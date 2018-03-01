@@ -47,10 +47,12 @@ def get_traces():
     filepath = get_filepath()
     return trace_mining.process_trace_info(request.args, filepath)
 
+
 @app.route("/flows", methods=['GET'])
 def get_flows():
     filepath = get_filepath()
     return flow_mining.process_flow_info(request.args, filepath)
+
 
 @app.route("/file-headers", methods=['GET'])
 def get_file_headers():
