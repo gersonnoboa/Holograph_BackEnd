@@ -27,6 +27,8 @@ def get_active_time_array(args_from_request, filepath):
 
         split = next(reader)
 
+        print(split)
+        
         idx_case_id = split.index(case_id)
         idx_resource = split.index(resource)
         idx_activity = split.index(activity)
