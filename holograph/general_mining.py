@@ -112,6 +112,7 @@ def get_variants(events):
     for case in cases:
         determine_variant(case, variants)
 
+    variants.sort(key=lambda x: len(x.cases), reverse=True)
     return variants
 
 

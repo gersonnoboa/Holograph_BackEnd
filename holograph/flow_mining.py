@@ -13,10 +13,9 @@ def process_flow_info(args_from_request, filepath):
 
 
 def mine_flow_info(lst):
-    lst.sort(key=lambda x: len(x.cases), reverse=True)
     filtered_list = list(variant for variant in lst if len(variant.cases) > 0 and len(variant.cases[0]) > 2)
 
-    variant_flows = VariantFlows()
+    variant_flows = list()
     for variant in filtered_list:
         statistics = list()
         for case in variant.cases:
@@ -37,11 +36,11 @@ def mine_flow_info(lst):
 
         if len(statistics) > 0:
             flow = Flow(variant.activity_list, statistics)
-            variant_flows.flows.append(flow)
-            if len(variant_flows.flows) == 5:
+            variant_flows.append(flow)
+            if len(variant_flows) == 5:
                 break
 
-    return jsonpickle.encode(variant_flows, unpicklable=False)
+    return variant_flows
 
 
 def get_time_before(case, index):
