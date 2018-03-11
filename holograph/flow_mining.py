@@ -29,11 +29,10 @@ def mine_flow_info(lst):
                     time_before = get_time_before(case, x)
                     time_taken = get_time_taken(case, x)
                     time_after = get_time_after(case, x)
-                    flow_statistic = FlowStatistic(
-                        resource, activity, time_before, time_taken, time_after)
+                    flow_statistic = FlowStatistic(resource, activity, time_before, time_taken, time_after)
                     statistic_group.append(flow_statistic)
                 statistics.append(statistic_group)
-
+    
         if len(statistics) > 0:
             flow = Flow(variant.activity_list, statistics)
             variant_flows.append(flow)
