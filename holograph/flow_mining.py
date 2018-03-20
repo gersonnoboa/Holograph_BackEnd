@@ -13,31 +13,51 @@ def process_flow_info(args_from_request, filepath):
 
 
 def mine_flow_info(lst):
-    filtered_list = list(variant for variant in lst if len(variant.cases) > 0 and len(variant.cases[0]) > 2)
+    filtered_list = list(variant for variant in lst if len(
+        variant.cases) > 0 and len(variant.cases[0]) > 2)
 
     variant_flows = list()
     for variant in filtered_list:
-        statistics = list()
+
+        if len(variant.cases) == 0:
+            continue
+        
+        case = variant.cases[0]
+        number_of_activities = len(case)
+
+        case_statistic = CaseStatistic()
+        case_statistic.statistics = [ActivityStatistic() for i in range(number_of_activities)]
+
         for case in variant.cases:
-            resources_in_case = set(event.resource for event in case)
-            if len(resources_in_case) > 1:
-                statistic_group = list()
-                for x in range(0, len(case)):
-                    event = case[x]
-                    resource = event.resource
-                    activity = event.activity
-                    time_before = get_time_before(case, x)
-                    time_taken = get_time_taken(case, x)
-                    time_after = get_time_after(case, x)
-                    flow_statistic = FlowStatistic(resource, activity, time_before, time_taken, time_after)
-                    statistic_group.append(flow_statistic)
-                statistics.append(statistic_group)
-    
-        if len(statistics) > 0:
-            flow = Flow(variant.activity_list, statistics)
-            variant_flows.append(flow)
-            if len(variant_flows) == 5:
-                break
+            
+            activity_list = list()            
+            for x in range(0, len(case)):
+                event = case[x]
+                activity = case_statistic.statistics[x]
+                activity.activity_name = event.activity
+
+                activity_list.append(event.activity)
+                
+                time_before = get_time_before(case, x)
+                time_taken = get_time_taken(case, x)
+                time_after = get_time_after(case, x)
+
+                lookup = [stat for stat in activity.resources if stat.resource == event.resource]
+
+                stat = None
+
+                if len(lookup) == 0:
+                    stat = ResourceStatistic()
+                    stat.resource = event.resource
+                    activity.resources.append(stat)
+                else:
+                    stat = lookup[0]
+
+                stat.add_to_resource(time_before, time_taken, time_after)
+
+            case_statistic.activity_list = activity_list
+                
+        variant_flows.append(case_statistic)
 
     return variant_flows
 
@@ -82,3 +102,30 @@ class FlowStatistic:
         self.time_before = time_before
         self.time_taken = time_taken
         self.time_after = time_after
+
+class CaseStatistic:
+    def __init__(self):
+      self.statistics = []
+      self.activity_list = []
+        
+
+class ResourceStatistic:
+    
+    def __init__(self):
+        self.resource = ""
+        self.time_before = 0
+        self.time_taken = 0
+        self.time_after = 0
+        self.occurrences = 0
+
+    def add_to_resource(self, time_before, time_taken, time_after):
+        self.time_before += time_before
+        self.time_taken += time_taken
+        self.time_after += time_after
+        self.occurrences += 1
+
+
+class ActivityStatistic:
+    def __init__(self):
+        self.activity_name = ""
+        self.resources = []
