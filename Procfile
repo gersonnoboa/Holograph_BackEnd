@@ -1,1 +1,1 @@
-web: gunicorn app:holograph
+web: gunicorn app:holograph/holograph
