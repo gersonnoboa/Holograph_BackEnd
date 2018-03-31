@@ -12,7 +12,7 @@ def process_flow_info(args_from_request, filepath):
     return jsonpickle.encode(info, unpicklable=False)
 
 
-def mine_flow_info(lst):
+def mine_flow_info(lst, reduced=False):
     filtered_list = list(variant for variant in lst if len(
         variant.cases) > 0 and len(variant.cases[0]) > 2)
 
@@ -21,7 +21,7 @@ def mine_flow_info(lst):
 
         if len(variant.cases) == 0:
             continue
-        
+
         case = variant.cases[0]
         number_of_activities = len(case)
 
@@ -29,18 +29,18 @@ def mine_flow_info(lst):
         case_statistic.statistics = [ActivityStatistic() for i in range(number_of_activities)]
 
         for case in variant.cases:
-            
-            activity_list = list()            
+
+            activity_list = list()
             for x in range(0, len(case)):
                 event = case[x]
                 activity = case_statistic.statistics[x]
                 activity.activity_name = event.activity
 
                 activity_list.append(event.activity)
-                
+
                 time_before = get_time_before(case, x)
-                time_taken = get_time_taken(case, x)
                 time_after = get_time_after(case, x)
+                time_taken = get_time_taken(case, x)
 
                 lookup = [stat for stat in activity.resources if stat.resource == event.resource]
 
@@ -56,7 +56,7 @@ def mine_flow_info(lst):
                 stat.add_to_resource(time_before, time_taken, time_after)
 
             case_statistic.activity_list = activity_list
-                
+
         variant_flows.append(case_statistic)
 
     return variant_flows
@@ -107,10 +107,10 @@ class CaseStatistic:
     def __init__(self):
       self.statistics = []
       self.activity_list = []
-        
+
 
 class ResourceStatistic:
-    
+
     def __init__(self):
         self.resource = ""
         self.time_before = 0

@@ -7,6 +7,7 @@ import csv_handling
 import active_time_mining
 import trace_mining
 import flow_mining
+import individual_mining
 
 app = Flask(__name__)
 CORS(app)
@@ -39,6 +40,7 @@ def upload_file():
 @app.route("/active-time", methods=['GET'])
 def get_active_time_info():
     filepath = get_filepath()
+    
     return active_time_mining.process_active_time_info(request.args, filepath)
 
 
@@ -52,6 +54,12 @@ def get_traces():
 def get_flows():
     filepath = get_filepath()
     return flow_mining.process_flow_info(request.args, filepath)
+
+
+@app.route("/individual", methods=['GET'])
+def get_individual():
+    filepath = get_filepath()
+    return individual_mining.process_individual_info(request.args, filepath)
 
 
 @app.route("/file-headers", methods=['GET'])

@@ -9,7 +9,7 @@
             "pythonPath": "${config:python.pythonPath}",
             "program": "${workspaceRoot}\\run.py",
             "env": {
-                "FLASK_APP": "${workspaceRoot}\\holograph\\holograph.py"
+                "FLASK_APP": "${workspaceRoot}\\holograph.py"
             },
             "args": [
                 "run",
