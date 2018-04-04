@@ -24,7 +24,7 @@ def mine_individual_info(lst):
         middle = variant.statistics[divs.middle_start:divs.middle_end]
         final = variant.statistics[divs.final_start:]
 
-        division_results = DivisionResults(process_initial_information(
+        division_results = DivisionResults(variant.activity_list, process_initial_information(
             initial), process_initial_information(middle), process_initial_information(final))
         individual_info.append(division_results)
 
@@ -57,7 +57,8 @@ class Divisions:
 
 
 class DivisionResults:
-    def __init__(self, initial, middle, final):
+    def __init__(self, activity_list, initial, middle, final):
+        self.activity_list = activity_list
         self.initial = initial
         self.middle = middle
         self.final = final
