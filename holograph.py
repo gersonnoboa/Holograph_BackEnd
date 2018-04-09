@@ -8,6 +8,7 @@ import active_time_mining
 import trace_mining
 import flow_mining
 import individual_mining
+import group_mining
 
 app = Flask(__name__)
 CORS(app)
@@ -60,6 +61,12 @@ def get_flows():
 def get_individual():
     filepath = get_filepath()
     return individual_mining.process_individual_info(request.args, filepath)
+
+
+@app.route("/group", methods=['GET'])
+def get_group():
+    filepath = get_filepath()
+    return group_mining.process_group_info(request.args, filepath)
 
 
 @app.route("/file-headers", methods=['GET'])
