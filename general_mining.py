@@ -135,6 +135,9 @@ def get_grouped_cases(events):
         filtered_case = [event for event in events if event.case_id == case]
         grouped_cases.append(filtered_case)
 
+    for cases in grouped_cases:
+        cases.sort(key=lambda x: x.start_date)
+        
     return grouped_cases
 
 

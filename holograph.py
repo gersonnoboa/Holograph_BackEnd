@@ -40,33 +40,31 @@ def upload_file():
 
 @app.route("/active-time", methods=['GET'])
 def get_active_time_info():
-    filepath = get_filepath()
-    
-    return active_time_mining.process_active_time_info(request.args, filepath)
+    return active_time_mining.process_active_time_info(request.args, get_filepath())
 
 
 @app.route("/traces", methods=['GET'])
 def get_traces():
-    filepath = get_filepath()
-    return trace_mining.process_trace_info(request.args, filepath)
+    return trace_mining.process_trace_info(request.args, get_filepath())
 
 
 @app.route("/flows", methods=['GET'])
 def get_flows():
-    filepath = get_filepath()
-    return flow_mining.process_flow_info(request.args, filepath)
+    return flow_mining.process_flow_info(request.args, get_filepath())
 
 
 @app.route("/individual", methods=['GET'])
 def get_individual():
-    filepath = get_filepath()
-    return individual_mining.process_individual_info(request.args, filepath)
+    return individual_mining.process_individual_info(request.args, get_filepath())
 
 
-@app.route("/group", methods=['GET'])
-def get_group():
-    filepath = get_filepath()
-    return group_mining.process_group_info(request.args, filepath)
+@app.route("/group-activity", methods=['GET'])
+def get_group_activity():
+    return group_mining.process_group_activity_info(request.args, get_filepath())
+
+@app.route("/group-resource", methods=['GET'])
+def get_group_resource():
+    return group_mining.process_group_resource_info(request.args, get_filepath())
 
 
 @app.route("/file-headers", methods=['GET'])
