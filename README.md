@@ -1,5 +1,5 @@
 # Holograph Back-End
-This tool was done as a part of my Master's thesis for the University of Tartu. It is a resource impact analysis tool, that provides data to the front-end implementation of Holograph, which can be found [here](https://github.com/gersonnoboa/Holograph_FrontEnd]).
+This tool was done as a part of my Master's thesis for the University of Tartu. It is a resource impact analysis tool, that provides data to the front-end implementation of Holograph, which can be found [here](https://github.com/gersonnoboa/Holograph_FrontEnd).
 
 Holograph Back-End is the service that provides the information needed for displaying the different visualizations that Holograph Front-End supports. It was developed in Python with the Flask framework. Although it was made with Holograph Front-End in mind, since it is a service that receives and provides data, any application could be built on top of it. Just as the front-end implementation, Holograph Back-End can be divided into three parts: file upload, general mining, and results.
 
