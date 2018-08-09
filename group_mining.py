@@ -52,7 +52,6 @@ class CaseConnection:
 
     def add_to_two_sided_connection(self, first_event, second_event):
         result = list(connection for connection in self.two_sided_connections if connection.from_resource == first_event.resource and connection.to_resource == second_event.resource and connection.from_activity == first_event.activity and connection.to_activity == second_event.activity)
-
         connection = None
         if len(result) == 0:
             connection = TwoSidedConnection(first_event, second_event)

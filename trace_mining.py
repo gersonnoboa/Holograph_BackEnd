@@ -71,12 +71,11 @@ def update_facts(resource, trace_variant):
     below_average = trace_variant.get_fact(FactName.BelowAverage.value)
     accumulate_fact(below_average, resource.average_time_with, resource.name, False)
 
-    positive_impact = trace_variant.get_fact(FactName.PositiveImpact.value)
-    accumulate_fact_with_threshold(positive_impact, resource.average_time_with, resource.name, True, trace_variant.average_time)
+    #positive_impact = trace_variant.get_fact(FactName.PositiveImpact.value)
+    #accumulate_fact_with_threshold(positive_impact, resource.average_time_with, resource.name, True, trace_variant.average_time)
 
-    negative_impact = trace_variant.get_fact(FactName.NegativeImpact.value)
-    accumulate_fact_with_threshold(
-        negative_impact, resource.average_time_with, resource.name, False, trace_variant.average_time)
+    #negative_impact = trace_variant.get_fact(FactName.NegativeImpact.value)
+    #accumulate_fact_with_threshold(negative_impact, resource.average_time_with, resource.name, False, trace_variant.average_time)
 
     most_involved = trace_variant.get_fact(FactName.MostInvolved.value)
     revise_fact(most_involved, resource.total_time_with, resource.name, True)

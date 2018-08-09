@@ -23,10 +23,11 @@ def get_active_time_array(args_from_request, filepath):
     lst = []
 
     with open(filepath, 'r') as f:
-        reader = csv_handling.get_csv_reader(f)
+        reader = csv_handling.get_csv_reader_with_semicolon(f)
 
         split = next(reader)
 
+        print(split)
         idx_case_id = split.index(case_id)
         idx_resource = split.index(resource)
         idx_activity = split.index(activity)
@@ -36,7 +37,7 @@ def get_active_time_array(args_from_request, filepath):
 
         local_date_format_string = infer_date_format_string(split)
 
-        for row in reader:
+        for idx, row in enumerate(reader):
             case = row[idx_case_id]
             res = row[idx_resource]
             act = row[idx_activity]
