@@ -39,49 +39,51 @@ def upload_file():
 
 
 @app.route("/active-time", methods=['GET'])
-@cross_origin(origin="http://holograph.herokuapp.com", headers=['Content-Type', 'Authorization'])
+@cross_origin(origin="*", headers=['Content-Type', 'Authorization'])
 def get_active_time_info():
     return active_time_mining.process_active_time_info(request.args, get_filepath())
 
 
 @app.route("/traces", methods=['GET'])
-@cross_origin(origin="http://holograph.herokuapp.com", headers=['Content-Type', 'Authorization'])
+@cross_origin(origin="*", headers=['Content-Type', 'Authorization'])
 def get_traces():
     return trace_mining.process_trace_info(request.args, get_filepath())
 
 
 @app.route("/flows", methods=['GET'])
-@cross_origin(origin="http://holograph.herokuapp.com", headers=['Content-Type', 'Authorization'])
+@cross_origin(origin="*", headers=['Content-Type', 'Authorization'])
 def get_flows():
     return flow_mining.process_flow_info(request.args, get_filepath())
 
 
 @app.route("/individual", methods=['GET'])
-@cross_origin(origin="http://holograph.herokuapp.com", headers=['Content-Type', 'Authorization'])
+@cross_origin(origin="*", headers=['Content-Type', 'Authorization'])
 def get_individual():
     return individual_mining.process_individual_info(request.args, get_filepath())
 
 
 @app.route("/group-activity", methods=['GET'])
-@cross_origin(origin="http://holograph.herokuapp.com", headers=['Content-Type', 'Authorization'])
+@cross_origin(origin="*", headers=['Content-Type', 'Authorization'])
 def get_group_activity():
     return group_mining.process_group_activity_info(request.args, get_filepath())
 
 @app.route("/group-resource", methods=['GET'])
-@cross_origin(origin="http://holograph.herokuapp.com", headers=['Content-Type', 'Authorization'])
+@cross_origin(origin="*", headers=['Content-Type', 'Authorization'])
 def get_group_resource():
     return group_mining.process_group_resource_info(request.args, get_filepath())
 
 
 @app.route("/file-headers", methods=['GET'])
-@cross_origin(origin="http://holograph.herokuapp.com", headers=['Content-Type', 'Authorization'])
+@cross_origin(origin="*", headers=['Content-Type', 'Authorization'])
 def get_file_headers():
     filepath = get_filepath()
     return csv_handling.read_info_from_csv(filepath)
 
 
 @app.after_request
-def after_request(response):
+def after_request(response):ˇ
+    response.headers.add('Access-Control-Allow-Origin',
+                         '*')
   response.headers.add('Access-Control-Allow-Methods',
                        'GET,PUT,POST,DELETE,OPTIONS')
   return response
