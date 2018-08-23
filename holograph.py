@@ -85,9 +85,12 @@ def get_file_headers():
 
 @app.after_request
 def after_request(response):
-    header = response.headers
-    header['Access-Control-Allow-Origin'] = '*'
-    return response
+  response.headers.add('Access-Control-Allow-Origin', '*')
+  response.headers.add('Access-Control-Allow-Headers',
+                       'Content-Type,Authorization')
+  response.headers.add('Access-Control-Allow-Methods',
+                       'GET,PUT,POST,DELETE,OPTIONS')
+  return response
 
 
 def get_filepath():
@@ -99,4 +102,4 @@ def get_filepath():
 
 if __name__ == "__main__":
     #app.run(host='0.0.0.0')
-    app.run(threaded=True)
+    app.run()
