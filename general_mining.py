@@ -27,7 +27,6 @@ def get_active_time_array(args_from_request, filepath):
 
         split = next(reader)
 
-        print(split)
         idx_case_id = split.index(case_id)
         idx_resource = split.index(resource)
         idx_activity = split.index(activity)
@@ -114,7 +113,7 @@ def get_variants(events):
         determine_variant(case, variants)
 
     variants.sort(key=lambda x: len(x.cases), reverse=True)
-    return variants
+    return variants[:10]
 
 
 def determine_variant(case, variant_list):
